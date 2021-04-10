@@ -1,25 +1,24 @@
 <template>
-  <div id="app">
-    <p>SCORE: {{ snake.body_indexes.length - 1 }}</p>
+  <div class="hellosnake">
+    <p>SCORE: {{ snake.bodyIndexes.length - 1 }}</p>
 
-    <div id="map">
-      <!-- セルを100個生成して、必要に応じてhead, body, fruitクラスを付ける -->
-      <!-- （注意：Vueは v-for="i in 数値" としたとき、iが1から始まる） -->
+    <div class="hellosnake__map">
+      <!-- セルを100個生成して、必要に応じてhead, body, memberクラスを付ける -->
       <div
-        v-for="i in grid_size * grid_size"
+        v-for="i in gridSize * gridSize"
         :key="i"
         :class="{
           cell: true,
-          head: snake_head_index === i - 1,
-          body: snake.body_indexes.includes(i - 1),
-          fruit: fruit_index === i - 1,
+          head: snakeHeadIndex === i - 1,
+          body: snake.bodyIndexes.includes(i - 1),
+          member: memberIndex === i - 1,
         }"
       >
         <!-- {{ i - 1 }} -->
       </div>
     </div>
 
-    <p v-if="is_gameover">
+    <p v-if="isGameover">
       GAME OVER<br />
       <button onclick="location.reload()">RETRY</button>
     </p>
@@ -27,168 +26,160 @@
 </template>
 
 <script>
+import { computed, onMounted, ref, watch } from "vue";
+
 export default {
   name: "HelloSnake",
-  props: {
-    msg: String,
-  },
-  data() {
-    return {
-      grid_size: 10, // 10 x 10 マス
-      fruit_index: 0, // フルーツの位置インデックス
+  setup() {
+    let gridSize = ref(10); // 10 x 10 マス
+    let memberIndex = ref(0); // メンバーの位置インデックス
 
-      // ヘビに関するデータ
-      snake: {
-        // 頭の座標（初期値）
-        head_pos: {
-          x: 1,
-          y: 3,
-        },
+    // ヘビに関するデータ
+    let snake = ref({
+      headPos: {
+        x: 1,
+        y: 3,
+      }, // 初期位置
+      bodyIndexes: [0], // 体の位置インデックスたち
+      direction: "→", // 進行方向
+      speed: 400, // 1マス進むのにかかる時間[ms]
+    });
 
-        body_indexes: [0], // 体の位置インデックスたち
-        direction: "→", // 進行方向
-        speed: 400, // 1マス進むのにかかる時間[ms]
-      },
-    };
-  },
-
-  // 初期化
-  created() {
-    // フルーツの位置をランダムに移動
-    this.randomize_fruit_index();
-
-    // キーボード入力のイベントをon_keydownメソッドに投げる
-    document.onkeydown = () => {
-      this.on_keydown(event.keyCode);
-    };
-
-    // 時間を動かし始める
-    this.time_goes();
-  },
-
-  watch: {
-    // フルーツを食べているか監視
-    is_eating_fruit(newValue) {
-      if (!newValue) return; // 食べていなかったら何もしない
-      this.grow_up_snake();
-      this.randomize_fruit_index();
-    },
-  },
-
-  computed: {
-    // ヘビの頭の座標をインデックスに変換
-    snake_head_index() {
-      if (this.is_frameout) return null;
-      return this.snake.head_pos.y * this.grid_size + this.snake.head_pos.x;
-    },
-
-    // フルーツ食べてる？
-    is_eating_fruit() {
-      return this.snake_head_index === this.fruit_index;
-    },
-
-    // 自己衝突してる？
-    is_suicided() {
-      return this.snake.body_indexes.includes(this.snake_head_index);
-    },
-
-    // ヘビの頭は画面外？
-    is_frameout() {
-      const head = this.snake.head_pos;
+    // コンピューテッド
+    const isFrameout = computed(() => {
+      const head = snake.value.headPos;
       return (
         head.x < 0 ||
-        this.grid_size <= head.x ||
+        gridSize.value <= head.x ||
         head.y < 0 ||
-        this.grid_size <= head.y
+        gridSize.value <= head.y
       );
-    },
+    });
+
+    const snakeHeadIndex = computed(() => {
+      if (isFrameout.value) return null;
+      return snake.value.headPos.y * gridSize.value + snake.value.headPos.x;
+    });
+
+    const isGatheringMember = computed(() => {
+      return snakeHeadIndex.value === memberIndex.value;
+    });
+
+    // 自己衝突してる？
+    const isSuicided = computed(() => {
+      return snake.value.bodyIndexes.includes(snakeHeadIndex.value);
+    });
 
     // ゲームオーバー？
-    is_gameover() {
-      return this.is_suicided || this.is_frameout;
-    },
-  },
+    const isGameover = computed(() => {
+      return isSuicided.value || isFrameout.value;
+    });
 
-  methods: {
-    // 時間を進める
-    time_goes() {
-      if (this.is_gameover) return;
-      this.forward_snake();
-
-      // speedミリ秒後に自分自身を呼び出す
-      setTimeout(this.time_goes.bind(this), this.snake.speed);
-    },
-
-    // ヘビを進める
-    forward_snake() {
-      // 体の最後尾を頭に持ってくる
-      this.snake.body_indexes.shift();
-      this.snake.body_indexes.push(this.snake_head_index);
-
-      // 頭を1マス移動
-      switch (this.snake.direction) {
-        case "←":
-          this.snake.head_pos.x--;
-          break;
-        case "↑":
-          this.snake.head_pos.y--;
-          break;
-        case "→":
-          this.snake.head_pos.x++;
-          break;
-        case "↓":
-          this.snake.head_pos.y++;
-          break;
-      }
-    },
-
-    // ヘビの体を伸ばす
-    grow_up_snake() {
-      this.snake.body_indexes.unshift(this.snake.body_indexes[0]);
-    },
-
-    // フルーツの位置をランダムに移動
-    randomize_fruit_index() {
-      this.fruit_index = Math.floor(
-        Math.random() * this.grid_size * this.grid_size
+    // メソッド
+    // メンバーの位置をランダムに移動
+    const randomizeMemberIndex = () => {
+      memberIndex.value = Math.floor(
+        Math.random() * gridSize.value * gridSize.value
       ); // 0 〜 99 の乱数
-    },
+    };
+
+    const growUpSnake = () => {
+      snake.value.bodyIndexes.unshift(snake.value.bodyIndexes[0]);
+    };
 
     // キー入力を受け取ってヘビの進行方向を変える（逆方向は不可）
-    on_keydown(keyCode) {
+    const onKeydown = (keyCode) => {
       switch (keyCode) {
         case 37: // 「←」キーが押された
-          if (this.snake.direction !== "→") {
-            this.snake.direction = "←";
+          if (snake.value.direction !== "→") {
+            snake.value.direction = "←";
           }
           break;
 
         case 38: // 「↑」キーが押された
-          if (this.snake.direction !== "↓") {
-            this.snake.direction = "↑";
+          if (snake.value.direction !== "↓") {
+            snake.value.direction = "↑";
           }
           break;
 
         case 39: // 「→」キーが押された
-          if (this.snake.direction !== "←") {
-            this.snake.direction = "→";
+          if (snake.value.direction !== "←") {
+            snake.value.direction = "→";
           }
           break;
 
         case 40: // 「↓」キーが押された
-          if (this.snake.direction !== "↑") {
-            this.snake.direction = "↓";
+          if (snake.value.direction !== "↑") {
+            snake.value.direction = "↓";
           }
           break;
       }
-    },
+    };
+
+    // ヘビを進める
+    const forwardSnake = () => {
+      // 体の最後尾を頭に持ってくる
+      snake.value.bodyIndexes.shift();
+      snake.value.bodyIndexes.push(snakeHeadIndex.value);
+
+      // 頭を1マス移動
+      switch (snake.value.direction) {
+        case "←":
+          snake.value.headPos.x--;
+          break;
+        case "↑":
+          snake.value.headPos.y--;
+          break;
+        case "→":
+          snake.value.headPos.x++;
+          break;
+        case "↓":
+          snake.value.headPos.y++;
+          break;
+      }
+    };
+
+    // 時間を進める
+    const timeGoes = () => {
+      if (isGameover.value) return;
+      forwardSnake();
+
+      // speedミリ秒後に自分自身を呼び出す
+      setTimeout(timeGoes.bind(this), snake.value.speed);
+    };
+
+    // 初期化処理
+    onMounted(() => {
+      randomizeMemberIndex();
+      // キーボード入力のイベントをonKeydownメソッドに投げる
+      document.onkeydown = (event) => {
+        onKeydown(event.keyCode);
+      };
+      // 時間を動かし始める
+      timeGoes();
+    });
+
+    watch(isGatheringMember, (newValue) => {
+      if (!newValue) return; // 食べていなかったら何もしない
+      growUpSnake();
+      randomizeMemberIndex();
+    });
+
+    return {
+      gridSize,
+      memberIndex,
+      snake,
+      isFrameout,
+      snakeHeadIndex,
+      isGameover,
+    };
   },
 };
 </script>
 
 <style>
 /* グリッドレイアウト */
-#map {
+.hellosnake__map {
   --grid-size: 10; /* 10 x 10 マス（CSS変数） */
 
   display: grid;
@@ -208,7 +199,7 @@ export default {
 }
 
 /* フルーツの色 */
-.cell.fruit {
+.cell.member {
   background-color: red;
 }
 
