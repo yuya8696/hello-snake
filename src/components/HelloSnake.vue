@@ -27,23 +27,14 @@
 
 <script>
 import { computed, onMounted, ref, watch } from "vue";
+import setupAction from "../actions/setupAction";
 
 export default {
   name: "HelloSnake",
   setup() {
     let gridSize = ref(10); // 10 x 10 マス
-    let memberIndex = ref(0); // メンバーの位置インデックス
 
-    // ヘビに関するデータ
-    let snake = ref({
-      headPos: {
-        x: 1,
-        y: 3,
-      }, // 初期位置
-      bodyIndexes: [0], // 体の位置インデックスたち
-      direction: "→", // 進行方向
-      speed: 400, // 1マス進むのにかかる時間[ms]
-    });
+    const { memberIndex, snake, randomizeMemberIndex } = setupAction(gridSize);
 
     // コンピューテッド
     const isFrameout = computed(() => {
@@ -75,45 +66,8 @@ export default {
       return isSuicided.value || isFrameout.value;
     });
 
-    // メソッド
-    // メンバーの位置をランダムに移動
-    const randomizeMemberIndex = () => {
-      memberIndex.value = Math.floor(
-        Math.random() * gridSize.value * gridSize.value
-      ); // 0 〜 99 の乱数
-    };
-
     const growUpSnake = () => {
       snake.value.bodyIndexes.unshift(snake.value.bodyIndexes[0]);
-    };
-
-    // キー入力を受け取ってヘビの進行方向を変える（逆方向は不可）
-    const onKeydown = (keyCode) => {
-      switch (keyCode) {
-        case 37: // 「←」キーが押された
-          if (snake.value.direction !== "→") {
-            snake.value.direction = "←";
-          }
-          break;
-
-        case 38: // 「↑」キーが押された
-          if (snake.value.direction !== "↓") {
-            snake.value.direction = "↑";
-          }
-          break;
-
-        case 39: // 「→」キーが押された
-          if (snake.value.direction !== "←") {
-            snake.value.direction = "→";
-          }
-          break;
-
-        case 40: // 「↓」キーが押された
-          if (snake.value.direction !== "↑") {
-            snake.value.direction = "↓";
-          }
-          break;
-      }
     };
 
     // ヘビを進める
@@ -150,11 +104,11 @@ export default {
 
     // 初期化処理
     onMounted(() => {
-      randomizeMemberIndex();
-      // キーボード入力のイベントをonKeydownメソッドに投げる
-      document.onkeydown = (event) => {
-        onKeydown(event.keyCode);
-      };
+      // randomizeMemberIndex();
+      // // キーボード入力のイベントをonKeydownメソッドに投げる
+      // document.onkeydown = (event) => {
+      //   onKeydown(event.keyCode);
+      // };
       // 時間を動かし始める
       timeGoes();
     });
