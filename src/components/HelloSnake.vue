@@ -1,6 +1,6 @@
 <template>
   <div class="hellosnake">
-    <p>SCORE: {{ snake.bodyIndexes.length - 1 }}</p>
+    <p class="hellosnake__score">SCORE: {{ snake.bodyIndexes.length - 1 }}</p>
 
     <div class="hellosnake__map">
       <!-- セルを100個生成して、必要に応じてhead, body, memberクラスを付ける -->
@@ -177,34 +177,36 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 /* グリッドレイアウト */
-.hellosnake__map {
-  --grid-size: 10; /* 10 x 10 マス（CSS変数） */
+.hellosnake {
+  &__map {
+    --grid-size: 10; /* 10 x 10 マス（CSS変数） */
 
-  display: grid;
-  grid-template-columns: repeat(var(--grid-size), 100px); /* 10列 幅30px */
-  grid-template-rows: repeat(var(--grid-size), 100px); /* 10行 高さ30px */
-}
+    display: grid;
+    grid-template-columns: repeat(var(--grid-size), 100px); /* 10列 幅30px */
+    grid-template-rows: repeat(var(--grid-size), 100px); /* 10行 高さ30px */
 
-/* セルの色 */
-.cell {
-  border: 1px solid white;
-  background: whitesmoke;
-}
+    /* セルの色 */
+    .cell {
+      border: 1px solid white;
+      background: whitesmoke;
+    }
 
-/* ヘビの体の色 */
-.cell.body {
-  background-color: lightgray;
-}
+    /* ヘビの体の色 */
+    .cell.body {
+      background-color: lightgray;
+    }
 
-/* フルーツの色 */
-.cell.member {
-  background-color: red;
-}
+    /* フルーツの色 */
+    .cell.member {
+      background-color: red;
+    }
 
-/* ヘビの頭の色 */
-.cell.head {
-  background-color: darkgray;
+    /* ヘビの頭の色 */
+    .cell.head {
+      background-color: darkgray;
+    }
+  }
 }
 </style>
