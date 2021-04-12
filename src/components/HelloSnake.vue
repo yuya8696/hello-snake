@@ -1,6 +1,8 @@
 <template>
   <div class="hellosnake">
-    <p class="hellosnake__score">SCORE: {{ snake.bodyIndexes.length - 1 }}</p>
+    <p class="hellosnake__score">
+      SCORE: {{ snake.bodyIndexes.value.length - 1 }}
+    </p>
 
     <div class="hellosnake__map">
       <!-- セルを100個生成して、必要に応じてhead, body, memberクラスを付ける -->
@@ -10,7 +12,7 @@
         :class="{
           cell: true,
           head: snakeHeadIndex === i - 1,
-          body: snake.bodyIndexes.includes(i - 1),
+          body: snake.bodyIndexes.value.includes(i - 1),
           member: memberIndex === i - 1,
         }"
       >
@@ -27,18 +29,21 @@
 
 <script>
 import { computed, onMounted, ref, watch } from "vue";
-import setupAction from "../actions/setupAction";
+
+import { setupAction, randomizeMemberIndex } from "../actions/setupAction";
+import gatheringMembersAction from "../actions/gatheringMembersAction";
 
 export default {
   name: "HelloSnake",
   setup() {
     let gridSize = ref(10); // 10 x 10 マス
 
-    const { memberIndex, snake, randomizeMemberIndex } = setupAction(gridSize);
+    // 1. メンバーの初期位置決定とキーボード入力定義
+    const { memberIndex, snake } = setupAction(gridSize);
 
-    // コンピューテッド
+    // 2. スネークの頭の位置確認
     const isFrameout = computed(() => {
-      const head = snake.value.headPos;
+      const head = snake.headPos.value;
       return (
         head.x < 0 ||
         gridSize.value <= head.x ||
@@ -49,16 +54,26 @@ export default {
 
     const snakeHeadIndex = computed(() => {
       if (isFrameout.value) return null;
-      return snake.value.headPos.y * gridSize.value + snake.value.headPos.x;
+      return snake.headPos.value.y * gridSize.value + snake.headPos.value.x;
     });
 
+    // 3. メンバーを集めた時にスネーク長を増やし、次のメンバー位置を決定する
     const isGatheringMember = computed(() => {
       return snakeHeadIndex.value === memberIndex.value;
     });
 
+    const { memberIndexUpdated, snakeUpdated } = gatheringMembersAction(
+      gridSize,
+      snake,
+      isGatheringMember
+    );
+
+    memberIndex.value = memberIndexUpdated.value;
+    Object.assign(snake.bodyIndexes.value, snakeUpdated.bodyIndexes.value);
+
     // 自己衝突してる？
     const isSuicided = computed(() => {
-      return snake.value.bodyIndexes.includes(snakeHeadIndex.value);
+      return snake.bodyIndexes.value.includes(snakeHeadIndex.value);
     });
 
     // ゲームオーバー？
@@ -66,29 +81,29 @@ export default {
       return isSuicided.value || isFrameout.value;
     });
 
-    const growUpSnake = () => {
-      snake.value.bodyIndexes.unshift(snake.value.bodyIndexes[0]);
-    };
+    // const growUpSnake = () => {
+    //   snake.bodyIndexes.value.unshift(snake.bodyIndexes.value[0]);
+    // };
 
     // ヘビを進める
     const forwardSnake = () => {
       // 体の最後尾を頭に持ってくる
-      snake.value.bodyIndexes.shift();
-      snake.value.bodyIndexes.push(snakeHeadIndex.value);
+      snake.bodyIndexes.value.shift();
+      snake.bodyIndexes.value.push(snakeHeadIndex.value);
 
       // 頭を1マス移動
-      switch (snake.value.direction) {
+      switch (snake.direction.value) {
         case "←":
-          snake.value.headPos.x--;
+          snake.headPos.value.x--;
           break;
         case "↑":
-          snake.value.headPos.y--;
+          snake.headPos.value.y--;
           break;
         case "→":
-          snake.value.headPos.x++;
+          snake.headPos.value.x++;
           break;
         case "↓":
-          snake.value.headPos.y++;
+          snake.headPos.value.y++;
           break;
       }
     };
@@ -99,7 +114,7 @@ export default {
       forwardSnake();
 
       // speedミリ秒後に自分自身を呼び出す
-      setTimeout(timeGoes.bind(this), snake.value.speed);
+      setTimeout(timeGoes.bind(this), snake.speed.value);
     };
 
     // 初期化処理
@@ -113,11 +128,11 @@ export default {
       timeGoes();
     });
 
-    watch(isGatheringMember, (newValue) => {
-      if (!newValue) return; // 食べていなかったら何もしない
-      growUpSnake();
-      randomizeMemberIndex();
-    });
+    // watch(isGatheringMember, (newValue) => {
+    //   if (!newValue) return;
+    //   growUpSnake();
+    //   memberIndex.value = randomizeMemberIndex(gridSize).value;
+    // });
 
     return {
       gridSize,
