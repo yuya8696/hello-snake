@@ -109,21 +109,21 @@ export default {
       }
     };
 
+    // 時間を止める
+    const sleep = (sec) => {
+      return new Promise((resolve) => setTimeout(resolve, sec * 1000));
+    };
+
     // 時間を進める
     const timeGoes = async () => {
       if (isGameover.value) return;
       if (isGatheringMember.value) {
-        await sleep(3);
+        await sleep(4);
       }
       forwardSnake();
 
       // speedミリ秒後に自分自身を呼び出す
       setTimeout(timeGoes.bind(this), snake.speed.value);
-    };
-
-    // 時間を止める
-    const sleep = (sec) => {
-      return new Promise((resolve) => setTimeout(resolve, sec * 1000));
     };
 
     // 初期化処理
