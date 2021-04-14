@@ -16,8 +16,13 @@ export default function gatheringMembersAction(
     return snake;
   };
 
-  watch(isGatheringMember, (newValue) => {
+  const sleep = () => {
+    return new Promise((resolve) => setTimeout(resolve, 3000));
+  };
+
+  watch(isGatheringMember, async (newValue) => {
     if (!newValue) return;
+    await sleep();
     snakeUpdated.bodyIndexes.value = growUpSnake().bodyIndexes.value;
     memberIndexUpdated.value = randomizeMemberIndex(gridSize).value;
   });

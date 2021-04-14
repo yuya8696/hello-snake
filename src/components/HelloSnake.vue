@@ -20,6 +20,11 @@
       </div>
     </div>
 
+    <!-- 画像表示 -->
+    <div v-if="isGatheringMember" class="hellosnake__image">
+      <img src="../assets/logo.png" />
+    </div>
+
     <p v-if="isGameover">
       GAME OVER<br />
       <button onclick="location.reload()">RETRY</button>
@@ -30,7 +35,7 @@
 <script>
 import { computed, onMounted, ref, watch } from "vue";
 
-import { setupAction, randomizeMemberIndex } from "../actions/setupAction";
+import { setupAction } from "../actions/setupAction";
 import gatheringMembersAction from "../actions/gatheringMembersAction";
 
 export default {
@@ -81,10 +86,6 @@ export default {
       return isSuicided.value || isFrameout.value;
     });
 
-    // const growUpSnake = () => {
-    //   snake.bodyIndexes.value.unshift(snake.bodyIndexes.value[0]);
-    // };
-
     // ヘビを進める
     const forwardSnake = () => {
       // 体の最後尾を頭に持ってくる
@@ -109,30 +110,26 @@ export default {
     };
 
     // 時間を進める
-    const timeGoes = () => {
+    const timeGoes = async () => {
       if (isGameover.value) return;
+      if (isGatheringMember.value) {
+        await sleep(3);
+      }
       forwardSnake();
 
       // speedミリ秒後に自分自身を呼び出す
       setTimeout(timeGoes.bind(this), snake.speed.value);
     };
 
+    // 時間を止める
+    const sleep = (sec) => {
+      return new Promise((resolve) => setTimeout(resolve, sec * 1000));
+    };
+
     // 初期化処理
     onMounted(() => {
-      // randomizeMemberIndex();
-      // // キーボード入力のイベントをonKeydownメソッドに投げる
-      // document.onkeydown = (event) => {
-      //   onKeydown(event.keyCode);
-      // };
-      // 時間を動かし始める
       timeGoes();
     });
-
-    // watch(isGatheringMember, (newValue) => {
-    //   if (!newValue) return;
-    //   growUpSnake();
-    //   memberIndex.value = randomizeMemberIndex(gridSize).value;
-    // });
 
     return {
       gridSize,
@@ -141,6 +138,7 @@ export default {
       isFrameout,
       snakeHeadIndex,
       isGameover,
+      isGatheringMember,
     };
   },
 };
@@ -149,12 +147,14 @@ export default {
 <style lang="scss">
 /* グリッドレイアウト */
 .hellosnake {
+  position: relative;
+
   &__map {
     --grid-size: 10; /* 10 x 10 マス（CSS変数） */
 
     display: grid;
-    grid-template-columns: repeat(var(--grid-size), 100px); /* 10列 幅30px */
-    grid-template-rows: repeat(var(--grid-size), 100px); /* 10行 高さ30px */
+    grid-template-columns: repeat(var(--grid-size), 80px); /* 10列 幅80px */
+    grid-template-rows: repeat(var(--grid-size), 80px); /* 10行 高さ80px */
 
     /* セルの色 */
     .cell {
@@ -176,6 +176,17 @@ export default {
     .cell.head {
       background-color: darkgray;
     }
+  }
+
+  &__image {
+    width: 800px;
+    height: 800px;
+    position: absolute;
+    top: 200px;
+    left: 0;
+    // right: 0;
+    // bottom: 0;
+    margin: auto;
   }
 }
 </style>
