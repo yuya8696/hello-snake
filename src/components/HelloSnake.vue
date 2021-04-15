@@ -1,8 +1,6 @@
 <template>
   <div class="hellosnake">
-    <p class="hellosnake__score">
-      SCORE: {{ snake.bodyIndexes.value.length - 1 }}
-    </p>
+    <p class="hellosnake__score">SCORE: {{ snake.bodyIndexes.length - 1 }}</p>
 
     <div class="hellosnake__map">
       <!-- セルを100個生成して、必要に応じてhead, body, memberクラスを付ける -->
@@ -12,7 +10,7 @@
         :class="{
           cell: true,
           head: snakeHeadIndex === i - 1,
-          body: snake.bodyIndexes.value.includes(i - 1),
+          body: snake.bodyIndexes.includes(i - 1),
           member: memberIndex === i - 1,
         }"
       >
@@ -33,22 +31,32 @@
 </template>
 
 <script>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, reactive, toRefs } from "vue";
 
-import { setupAction } from "../actions/setupAction";
+import { setupAction, randomizeMemberIndex } from "../actions/setupAction";
 import gatheringMembersAction from "../actions/gatheringMembersAction";
+import { goingTimeAction } from "../actions/goingTimeAction";
 
 export default {
   name: "HelloSnake",
   setup() {
     let gridSize = ref(10); // 10 x 10 マス
 
-    // 1. メンバーの初期位置決定とキーボード入力定義
-    const { memberIndex, snake } = setupAction(gridSize);
+    let memberIndex = ref(0); // メンバーの位置インデックス
 
-    // 2. スネークの頭の位置確認
+    // ヘビに関するデータ
+    const snake = reactive({
+      headPos: {
+        x: 1,
+        y: 3,
+      }, // 初期位置
+      bodyIndexes: [0], // 体の位置インデックスたち
+      direction: "→", // 進行方向
+      speed: 400, // 1マス進むのにかかる時間[ms]
+    });
+
     const isFrameout = computed(() => {
-      const head = snake.headPos.value;
+      const head = snake.headPos;
       return (
         head.x < 0 ||
         gridSize.value <= head.x ||
@@ -59,26 +67,17 @@ export default {
 
     const snakeHeadIndex = computed(() => {
       if (isFrameout.value) return null;
-      return snake.headPos.value.y * gridSize.value + snake.headPos.value.x;
+      return snake.headPos.y * gridSize.value + snake.headPos.x;
     });
 
-    // 3. メンバーを集めた時にスネーク長を増やし、次のメンバー位置を決定する
+    // メンバーを集めた？
     const isGatheringMember = computed(() => {
       return snakeHeadIndex.value === memberIndex.value;
     });
 
-    const { memberIndexUpdated, snakeUpdated } = gatheringMembersAction(
-      gridSize,
-      snake,
-      isGatheringMember
-    );
-
-    memberIndex.value = memberIndexUpdated.value;
-    Object.assign(snake.bodyIndexes.value, snakeUpdated.bodyIndexes.value);
-
     // 自己衝突してる？
     const isSuicided = computed(() => {
-      return snake.bodyIndexes.value.includes(snakeHeadIndex.value);
+      return snake.bodyIndexes.includes(snakeHeadIndex.value);
     });
 
     // ゲームオーバー？
@@ -86,50 +85,31 @@ export default {
       return isSuicided.value || isFrameout.value;
     });
 
-    // ヘビを進める
-    const forwardSnake = () => {
-      // 体の最後尾を頭に持ってくる
-      snake.bodyIndexes.value.shift();
-      snake.bodyIndexes.value.push(snakeHeadIndex.value);
-
-      // 頭を1マス移動
-      switch (snake.direction.value) {
-        case "←":
-          snake.headPos.value.x--;
-          break;
-        case "↑":
-          snake.headPos.value.y--;
-          break;
-        case "→":
-          snake.headPos.value.x++;
-          break;
-        case "↓":
-          snake.headPos.value.y++;
-          break;
-      }
-    };
-
-    // 時間を止める
-    const sleep = (sec) => {
-      return new Promise((resolve) => setTimeout(resolve, sec * 1000));
-    };
-
-    // 時間を進める
-    const timeGoes = async () => {
-      if (isGameover.value) return;
-      if (isGatheringMember.value) {
-        await sleep(4);
-      }
-      forwardSnake();
-
-      // speedミリ秒後に自分自身を呼び出す
-      setTimeout(timeGoes.bind(this), snake.speed.value);
-    };
-
     // 初期化処理
     onMounted(() => {
-      timeGoes();
+      // 1. メンバーの初期位置決定とキーボード入力定義
+      memberIndex.value = randomizeMemberIndex(gridSize, memberIndex).value;
+      snake.value = setupAction(snake).value;
+
+      // 2. 時間経過によるスネークのアクション
+      snake.value = goingTimeAction(
+        isGameover,
+        isGatheringMember,
+        snake,
+        snakeHeadIndex
+      ).value;
     });
+
+    // 3. メンバーを集めた時のアクション
+    const { memberIndexUpdated, snakeUpdated } = gatheringMembersAction(
+      gridSize,
+      memberIndex,
+      snake,
+      isGatheringMember
+    );
+
+    memberIndex.value = memberIndexUpdated.value;
+    Object.assign(snake.bodyIndexes, snakeUpdated.bodyIndexes);
 
     return {
       gridSize,

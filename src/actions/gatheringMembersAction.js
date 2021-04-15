@@ -1,30 +1,29 @@
 import { watch, ref, reactive } from "vue";
 import { randomizeMemberIndex } from "../actions/setupAction";
+import { sleep } from "../actions/goingTimeAction";
 
 export default function gatheringMembersAction(
   gridSize,
+  memberIndex,
   snake,
   isGatheringMember
 ) {
   const memberIndexUpdated = ref(0);
-  const snakeUpdated = reactive({
-    bodyIndexes: [0], // 体の位置インデックスたち
-  });
+  const snakeUpdated = reactive({});
 
   const growUpSnake = () => {
-    snake.bodyIndexes.value.unshift(snake.bodyIndexes.value[0]);
+    snake.bodyIndexes.unshift(snake.bodyIndexes[0]);
     return snake;
-  };
-
-  const sleep = (sec) => {
-    return new Promise((resolve) => setTimeout(resolve, sec * 1000));
   };
 
   watch(isGatheringMember, async (newValue) => {
     if (!newValue) return;
     await sleep(3);
-    snakeUpdated.bodyIndexes.value = growUpSnake().bodyIndexes.value;
-    memberIndexUpdated.value = randomizeMemberIndex(gridSize).value;
+    snakeUpdated.value = growUpSnake().value;
+    memberIndexUpdated.value = randomizeMemberIndex(
+      gridSize,
+      memberIndex
+    ).value;
     await sleep(2);
   });
 
