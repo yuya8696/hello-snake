@@ -10,13 +10,20 @@
         :class="{
           cell: true,
           head: snakeHeadIndex === i - 1,
-          body: snake.bodyIndexes.includes(i - 1),
+          ['body-' + (i - 1)]: snake.bodyIndexes.includes(i - 1),
           member: memberIndex === i - 1,
+        }"
+        :style="{
+          ...memberIndexImage,
+          ...snakeHeadImage,
+          ...setSnakeBodyImage(i),
         }"
       >
         <!-- {{ i - 1 }} -->
       </div>
     </div>
+
+    <!-- body: snake.bodyIndexes.includes(i - 1), -->
 
     <!-- 画像表示 -->
     <div v-if="isGatheringMember" class="hellosnake__image">
@@ -101,15 +108,35 @@ export default {
     });
 
     // 3. メンバーを集めた時のアクション
-    const { memberIndexUpdated, snakeUpdated } = gatheringMembersAction(
-      gridSize,
-      memberIndex,
-      snake,
-      isGatheringMember
-    );
+    const {
+      memberIndexUpdated,
+      snakeUpdated,
+      ImagePath,
+    } = gatheringMembersAction(gridSize, memberIndex, snake, isGatheringMember);
 
     memberIndex.value = memberIndexUpdated.value;
     Object.assign(snake.bodyIndexes, snakeUpdated.bodyIndexes);
+
+    const memberIndexImage = computed(() => ({
+      "--member-index-image": `url(${ImagePath.member})`,
+    }));
+
+    const snakeHeadImage = computed(() => ({
+      "--snake-head-image": `url(${ImagePath.head})`,
+    }));
+
+    const setSnakeBodyImage = (gridIndex) => {
+      if (!snake.bodyIndexes.includes(gridIndex - 1)) return "";
+      if (ImagePath.body.length === 0) return;
+
+      // gridIndexの順番ごとに異なる画像をセットする
+      console.log("target is " + snake.bodyIndexes.indexOf(gridIndex - 1));
+      return {
+        "background-image": `url(${
+          ImagePath.body[snake.bodyIndexes.indexOf(gridIndex - 1)]
+        })`,
+      };
+    };
 
     return {
       gridSize,
@@ -119,6 +146,9 @@ export default {
       snakeHeadIndex,
       isGameover,
       isGatheringMember,
+      memberIndexImage,
+      snakeHeadImage,
+      setSnakeBodyImage,
     };
   },
 };
@@ -143,18 +173,18 @@ export default {
     }
 
     /* ヘビの体の色 */
-    .cell.body {
-      background-color: lightgray;
-    }
+    // .cell.body {
+    //   background-color: lightgray;
+    // }
 
     /* フルーツの色 */
     .cell.member {
-      background-color: red;
+      background-image: var(--member-index-image);
     }
 
     /* ヘビの頭の色 */
     .cell.head {
-      background-color: darkgray;
+      background-image: var(--snake-head-image);
     }
   }
 
