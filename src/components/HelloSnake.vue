@@ -23,11 +23,9 @@
       </div>
     </div>
 
-    <!-- body: snake.bodyIndexes.includes(i - 1), -->
-
     <!-- 画像表示 -->
     <div v-if="isGatheringMember" class="hellosnake__image">
-      <img src="../assets/logo.png" />
+      <img :src="memberImages[snake.bodyIndexes.length + 1]" />
     </div>
 
     <p v-if="isGameover">
@@ -46,6 +44,8 @@ import {
 } from "../assets/scripts/setupAction";
 import gatheringMembersAction from "../assets/scripts/gatheringMembersAction";
 import { goingTimeAction } from "../assets/scripts/goingTimeAction";
+
+import memberImages from "../assets//library/imagePaths";
 
 export default {
   name: "HelloSnake",
@@ -152,6 +152,7 @@ export default {
       memberIndexImage,
       snakeHeadImage,
       setSnakeBodyImage,
+      memberImages,
     };
   },
 };
