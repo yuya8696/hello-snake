@@ -40,9 +40,12 @@
 <script>
 import { computed, onMounted, ref, reactive, toRefs } from "vue";
 
-import { setupAction, randomizeMemberIndex } from "../actions/setupAction";
-import gatheringMembersAction from "../actions/gatheringMembersAction";
-import { goingTimeAction } from "../actions/goingTimeAction";
+import {
+  setupAction,
+  randomizeMemberIndex,
+} from "../assets/scripts/setupAction";
+import gatheringMembersAction from "../assets/scripts/gatheringMembersAction";
+import { goingTimeAction } from "../assets/scripts/goingTimeAction";
 
 export default {
   name: "HelloSnake",
@@ -163,8 +166,8 @@ export default {
     --grid-size: 10; /* 10 x 10 マス（CSS変数） */
 
     display: grid;
-    grid-template-columns: repeat(var(--grid-size), 80px); /* 10列 幅80px */
-    grid-template-rows: repeat(var(--grid-size), 80px); /* 10行 高さ80px */
+    grid-template-columns: repeat(var(--grid-size), 50px); /* 10列 幅80px */
+    grid-template-rows: repeat(var(--grid-size), 50px); /* 10行 高さ80px */
 
     /* セルの色 */
     .cell {

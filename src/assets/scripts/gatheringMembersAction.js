@@ -1,20 +1,8 @@
 import { watch, ref, reactive } from "vue";
-import { randomizeMemberIndex } from "../actions/setupAction";
-import { sleep } from "../actions/goingTimeAction";
+import { randomizeMemberIndex } from "../scripts/setupAction";
+import { sleep } from "../scripts/goingTimeAction";
 
-const imagePaths = [
-  // スネークの頭の画像(初期値)
-  "src/assets/cat.jpg",
-
-  // スネークの体の画像（初期値）
-  "src/assets/cat.jpg",
-
-  // 集めるメンバーの画像
-  "src/assets/inu.jpg",
-  "src/assets/bird.jpg",
-  "src/assets/dummy1.jpg",
-  "src/assets/dummy2.jpg",
-];
+import imagePaths from "../library/imagePaths";
 
 export default function gatheringMembersAction(
   gridSize,
@@ -25,9 +13,9 @@ export default function gatheringMembersAction(
   const memberIndexUpdated = ref(0);
   const snakeUpdated = reactive({});
   const ImagePath = reactive({
-    member: "src/assets/inu.jpg",
-    head: "src/assets/cat.jpg",
-    body: ["src/assets/cat.jpg"],
+    member: "src/assets/images/ishida.jpg",
+    head: "src/assets/images/fukumura.jpg",
+    body: ["src/assets/images/ikuta.jpg"],
   });
 
   const growUpSnake = () => {
