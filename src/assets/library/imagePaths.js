@@ -7,9 +7,17 @@ const memberImages = [
 
   // 集めるメンバーの画像
   "src/assets/images/ishida.jpg",
-  "src/assets/bird.jpg",
-  "src/assets/dummy1.jpg",
-  "src/assets/dummy2.jpg",
+  "src/assets/images/sato.jpg",
+  "src/assets/images/oda.jpg",
+  "src/assets/images/nonaka.jpg",
+  "src/assets/images/makino.jpg",
+  "src/assets/images/haga.jpg",
+  "src/assets/images/kaga.jpg",
+  "src/assets/images/yokoyama.jpg",
+  "src/assets/images/morito.jpg",
+  "src/assets/images/kitagawa.jpg",
+  "src/assets/images/okamura.jpg",
+  "src/assets/images/yamazaki.jpg",
 ];
 
 export default memberImages;

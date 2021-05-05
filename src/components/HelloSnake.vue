@@ -138,6 +138,9 @@ export default {
         "background-image": `url(${
           ImageFilePath.body[snake.bodyIndexes.indexOf(gridIndex - 1)]
         })`,
+        "background-position": "center center",
+        "background-repeat": "no-repeat",
+        "background-size": "cover",
       };
     };
 
@@ -167,8 +170,17 @@ export default {
     --grid-size: 10; /* 10 x 10 マス（CSS変数） */
 
     display: grid;
-    grid-template-columns: repeat(var(--grid-size), 50px); /* 10列 幅80px */
-    grid-template-rows: repeat(var(--grid-size), 50px); /* 10行 高さ80px */
+    grid-template-columns: repeat(
+      var(--grid-size),
+      minmax(50px, 80px)
+    ); /* 10列 幅80px */
+    grid-template-rows: repeat(
+      var(--grid-size),
+      minmax(50px, 80px)
+    ); /* 10行 高さ80px */
+
+    align-items: stretch;
+    justify-self: center;
 
     /* セルの色 */
     .cell {
@@ -184,16 +196,23 @@ export default {
     /* フルーツの色 */
     .cell.member {
       background-image: var(--member-index-image);
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
     }
 
     /* ヘビの頭の色 */
     .cell.head {
       background-image: var(--snake-head-image);
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
     }
   }
 
   &__image {
     width: 800px;
+    object-fit: cover;
     height: 800px;
     position: absolute;
     top: 200px;
