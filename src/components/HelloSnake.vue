@@ -114,29 +114,29 @@ export default {
     const {
       memberIndexUpdated,
       snakeUpdated,
-      ImagePath,
+      ImageFilePath,
     } = gatheringMembersAction(gridSize, memberIndex, snake, isGatheringMember);
 
     memberIndex.value = memberIndexUpdated.value;
     Object.assign(snake.bodyIndexes, snakeUpdated.bodyIndexes);
 
     const memberIndexImage = computed(() => ({
-      "--member-index-image": `url(${ImagePath.member})`,
+      "--member-index-image": `url(${ImageFilePath.member})`,
     }));
 
     const snakeHeadImage = computed(() => ({
-      "--snake-head-image": `url(${ImagePath.head})`,
+      "--snake-head-image": `url(${ImageFilePath.head})`,
     }));
 
     const setSnakeBodyImage = (gridIndex) => {
       if (!snake.bodyIndexes.includes(gridIndex - 1)) return "";
-      if (ImagePath.body.length === 0) return;
+      if (ImageFilePath.body.length === 0) return;
 
       // gridIndexの順番ごとに異なる画像をセットする
       console.log("target is " + snake.bodyIndexes.indexOf(gridIndex - 1));
       return {
         "background-image": `url(${
-          ImagePath.body[snake.bodyIndexes.indexOf(gridIndex - 1)]
+          ImageFilePath.body[snake.bodyIndexes.indexOf(gridIndex - 1)]
         })`,
       };
     };

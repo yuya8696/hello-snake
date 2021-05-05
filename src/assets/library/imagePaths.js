@@ -1,5 +1,5 @@
-const imagePaths = [
-  // スネークの頭の画像(初期値)
+const memberImages = [
+  // スネークの頭の画像
   "src/assets/images/fukumura.jpg",
 
   // スネークの体の画像（初期値）
@@ -12,4 +12,4 @@ const imagePaths = [
   "src/assets/dummy2.jpg",
 ];
 
-export default imagePaths;
+export default memberImages;

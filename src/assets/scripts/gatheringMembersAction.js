@@ -2,7 +2,7 @@ import { watch, ref, reactive } from "vue";
 import { randomizeMemberIndex } from "../scripts/setupAction";
 import { sleep } from "../scripts/goingTimeAction";
 
-import imagePaths from "../library/imagePaths";
+import memberImages from "../library/imagePaths";
 
 export default function gatheringMembersAction(
   gridSize,
@@ -12,7 +12,7 @@ export default function gatheringMembersAction(
 ) {
   const memberIndexUpdated = ref(0);
   const snakeUpdated = reactive({});
-  const ImagePath = reactive({
+  const ImageFilePath = reactive({
     member: "src/assets/images/ishida.jpg",
     head: "src/assets/images/fukumura.jpg",
     body: ["src/assets/images/ikuta.jpg"],
@@ -23,6 +23,17 @@ export default function gatheringMembersAction(
     return snake;
   };
 
+  const defineImages = () => {
+    // メンバーの出現の順番あh配列の順番
+    ImageFilePath.member = memberImages[snake.bodyIndexes.length + 1];
+
+    // snakeの先頭はふくちゃんで固定
+    ImageFilePath.head = memberImages[0];
+
+    // 集めたメンバーをスネークの後方に足していく
+    ImageFilePath.body.unshift(memberImages[snake.bodyIndexes.length]);
+  };
+
   watch(isGatheringMember, async (newValue) => {
     if (!newValue) return;
     await sleep(3);
@@ -31,13 +42,7 @@ export default function gatheringMembersAction(
     snakeUpdated.value = growUpSnake().value;
 
     // snakeの先頭とメンバー画像のファイルパス指定する
-    ImagePath.member = imagePaths[snake.bodyIndexes.length + 1];
-    ImagePath.head = imagePaths[snake.bodyIndexes.length];
-    if (snake.bodyIndexes.length > 1) {
-      ImagePath.body.push(imagePaths[snake.bodyIndexes.length - 1]);
-      console.log("passed " + ImagePath.body);
-    }
-    console.log("ImagePath.body is " + ImagePath.body);
+    defineImages();
 
     // 次のメンバーの表示位置を決める
     memberIndexUpdated.value = randomizeMemberIndex(
@@ -50,6 +55,6 @@ export default function gatheringMembersAction(
   return {
     memberIndexUpdated,
     snakeUpdated,
-    ImagePath,
+    ImageFilePath,
   };
 }
