@@ -1,6 +1,20 @@
 <template>
   <div class="hellosnake">
-    <p class="hellosnake__score">SCORE: {{ snake.bodyIndexes.length - 1 }}</p>
+    <p class="hellosnake__score">
+      SCORE: {{ snake.bodyIndexes.length - 1 * 10 }}
+    </p>
+
+    <div v-if="isStart" class="hellosnake__start">
+      <button class="hellosnake__start__btn" @click="startingGame()">
+        START
+      </button>
+      <p></p>
+      <div>
+        <img :src="memberImages[0]" />
+        <img :src="memberImages[1]" />
+      </div>
+      <p style="font-size: 30px">↑↑ このメンバーで始める ↑↑</p>
+    </div>
 
     <div class="hellosnake__map">
       <!-- セルを100個生成して、必要に応じてhead, body, memberクラスを付ける -->
@@ -28,7 +42,7 @@
       <img :src="memberImages[snake.bodyIndexes.length + 1]" />
     </div>
 
-    <p v-if="isGameover">
+    <p v-if="isGameover" class="hellosnake__over">
       GAME OVER<br />
       <button onclick="location.reload()">RETRY</button>
     </p>
@@ -50,6 +64,8 @@ import memberImages from "../assets//library/imagePaths";
 export default {
   name: "HelloSnake",
   setup() {
+    let isStart = ref(true);
+
     let gridSize = ref(10); // 10 x 10 マス
 
     let memberIndex = ref(0); // メンバーの位置インデックス
@@ -97,20 +113,22 @@ export default {
 
     // 初期化処理
     onMounted(() => {
-      // 1. メンバーの初期位置決定とキーボード入力定義
+      // メンバーの初期位置決定とキーボード入力定義
       memberIndex.value = randomizeMemberIndex(gridSize, memberIndex).value;
       snake.value = setupAction(snake).value;
+    });
 
-      // 2. 時間経過によるスネークのアクション
+    const startingGame = () => {
+      // 時間経過によるスネークのアクション
       snake.value = goingTimeAction(
         isGameover,
         isGatheringMember,
         snake,
         snakeHeadIndex
       ).value;
-    });
+      isStart.value = false;
+    };
 
-    // 3. メンバーを集めた時のアクション
     const {
       memberIndexUpdated,
       snakeUpdated,
@@ -145,6 +163,8 @@ export default {
     };
 
     return {
+      isStart,
+      startingGame,
       gridSize,
       memberIndex,
       snake,
@@ -165,6 +185,28 @@ export default {
 /* グリッドレイアウト */
 .hellosnake {
   position: relative;
+
+  &__start {
+    position: absolute;
+    width: 100vw;
+    top: 200px;
+    left: 0;
+    margin: auto;
+    font-size: 50px;
+    text-align: center;
+
+    &__btn {
+      font-size: 50px;
+      color: #fff;
+      background-color: pink;
+      border-radius: 100vh;
+    }
+
+    &__btn:hover {
+      color: #fff;
+      background: pink;
+    }
+  }
 
   &__map {
     --grid-size: 10; /* 10 x 10 マス（CSS変数） */
@@ -220,6 +262,16 @@ export default {
     // right: 0;
     // bottom: 0;
     margin: auto;
+  }
+
+  &__over {
+    position: absolute;
+    width: 100vw;
+    top: 200px;
+    left: 0;
+    margin: auto;
+    font-size: 50px;
+    text-align: center;
   }
 }
 </style>
