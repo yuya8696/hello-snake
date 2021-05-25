@@ -1,7 +1,7 @@
 <template>
   <div class="hellosnake">
     <p class="hellosnake__score">
-      SCORE: {{ snake.bodyIndexes.length - 1 * 10 }}
+      SCORE: {{ (snake.bodyIndexes.length - 1) * 10 }}
     </p>
 
     <div v-if="isStart" class="hellosnake__start">
@@ -13,7 +13,7 @@
         <img :src="memberImages[0]" />
         <img :src="memberImages[1]" />
       </div>
-      <p style="font-size: 30px">↑↑ このメンバーで始める ↑↑</p>
+      <p style="font-size: 30px">↑↑ このメンバーで始めまるよ ↑↑</p>
     </div>
 
     <div class="hellosnake__map">
@@ -78,7 +78,7 @@ export default {
       }, // 初期位置
       bodyIndexes: [0], // 体の位置インデックスたち
       direction: "→", // 進行方向
-      speed: 400, // 1マス進むのにかかる時間[ms]
+      speed: 200, // 1マス進むのにかかる時間[ms]
     });
 
     const isFrameout = computed(() => {

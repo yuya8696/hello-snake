@@ -13,9 +13,9 @@ export default function gatheringMembersAction(
   const memberIndexUpdated = ref(0);
   const snakeUpdated = reactive({});
   const ImageFilePath = reactive({
-    member: "src/assets/images/ishida.jpg",
-    head: "src/assets/images/fukumura.jpg",
-    body: ["src/assets/images/ikuta.jpg"],
+    member: "src/assets/images/morning/ishida.jpg",
+    head: "src/assets/images/morning/fukumura.jpg",
+    body: ["src/assets/images/morning/ikuta.jpg"],
   });
 
   const growUpSnake = () => {
