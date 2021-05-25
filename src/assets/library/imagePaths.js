@@ -33,6 +33,7 @@ const memberImages = [
   "src/assets/images/juice=juice/kanazawa.jpg",
   "src/assets/images/juice=juice/uemura.jpg",
   "src/assets/images/juice=juice/inaba.jpg",
+  "src/assets/images/juice=juice/inoue.jpg",
   "src/assets/images/juice=juice/dannbara.jpg",
   "src/assets/images/juice=juice/kudo.jpg",
   "src/assets/images/juice=juice/matsunaga.jpg",

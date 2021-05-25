@@ -12,6 +12,9 @@
       <div>
         <img :src="memberImages[0]" />
         <img :src="memberImages[1]" />
+        <br />
+        <h1 class="hellosnake__start__text">　{{ nameLists[0] }}</h1>
+        <h1 class="hellosnake__start__text">　{{ nameLists[1] }}</h1>
       </div>
       <p style="font-size: 30px">↑↑ このメンバーで始めまるよ ↑↑</p>
     </div>
@@ -40,6 +43,9 @@
     <!-- 画像表示 -->
     <div v-if="isGatheringMember" class="hellosnake__image">
       <img :src="memberImages[snake.bodyIndexes.length + 1]" />
+      <h1 class="hellosnake__image__text">
+        {{ nameLists[snake.bodyIndexes.length + 1] }}
+      </h1>
     </div>
 
     <p v-if="isGameover" class="hellosnake__over">
@@ -50,7 +56,7 @@
 </template>
 
 <script>
-import { computed, onMounted, ref, reactive, toRefs } from "vue";
+import { computed, onMounted, ref, reactive } from "vue";
 
 import {
   setupAction,
@@ -59,7 +65,8 @@ import {
 import gatheringMembersAction from "../assets/scripts/gatheringMembersAction";
 import { goingTimeAction } from "../assets/scripts/goingTimeAction";
 
-import memberImages from "../assets//library/imagePaths";
+import memberImages from "../assets/library/imagePaths";
+import nameLists from "../assets/library/nameLists";
 
 export default {
   name: "HelloSnake",
@@ -176,6 +183,7 @@ export default {
       snakeHeadImage,
       setSnakeBodyImage,
       memberImages,
+      nameLists,
     };
   },
 };
@@ -192,7 +200,6 @@ export default {
     top: 200px;
     left: 0;
     margin: auto;
-    font-size: 50px;
     text-align: center;
 
     &__btn {
@@ -205,6 +212,12 @@ export default {
     &__btn:hover {
       color: #fff;
       background: pink;
+    }
+
+    &__text {
+      display: inline;
+      font-family: "Segoe UI", sans-serif;
+      color: coral;
     }
   }
 
@@ -262,6 +275,11 @@ export default {
     // right: 0;
     // bottom: 0;
     margin: auto;
+
+    &__text {
+      font-family: "Segoe UI", sans-serif;
+      color: coral;
+    }
   }
 
   &__over {
