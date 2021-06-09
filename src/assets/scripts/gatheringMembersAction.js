@@ -23,6 +23,11 @@ export default function gatheringMembersAction(
     return snake;
   };
 
+  const speedUpSnake = () => {
+    snake.speed -= 10;
+    return snake;
+  };
+
   const defineImages = () => {
     // メンバーの出現の順番あh配列の順番
     ImageFilePath.member = memberImages[snake.bodyIndexes.length + 1];
@@ -40,6 +45,9 @@ export default function gatheringMembersAction(
 
     // snakeの長さを増やす
     snakeUpdated.value = growUpSnake().value;
+
+    // snakeのスピードを増やす
+    snakeUpdated.value = speedUpSnake().value;
 
     // snakeの先頭とメンバー画像のファイルパス指定する
     defineImages();

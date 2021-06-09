@@ -5,6 +5,9 @@
     </p>
 
     <div v-if="isStart" class="hellosnake__start">
+      <p style="font-size: 50px; color: coral; font-family: sans-serif">
+        HELLO PROJECT SNAKE GAME
+      </p>
       <button class="hellosnake__start__btn" @click="startingGame()">
         START
       </button>
@@ -16,27 +19,29 @@
         <h1 class="hellosnake__start__text">　{{ nameLists[0] }}</h1>
         <h1 class="hellosnake__start__text">　{{ nameLists[1] }}</h1>
       </div>
-      <p style="font-size: 30px">↑↑ このメンバーで始めまるよ ↑↑</p>
+      <p style="font-size: 20px">↑↑ このメンバーで始めまるよ ↑↑</p>
     </div>
 
     <div class="hellosnake__map">
-      <!-- セルを100個生成して、必要に応じてhead, body, memberクラスを付ける -->
-      <div
-        v-for="i in gridSize * gridSize"
-        :key="i"
-        :class="{
-          cell: true,
-          head: snakeHeadIndex === i - 1,
-          ['body-' + (i - 1)]: snake.bodyIndexes.includes(i - 1),
-          member: memberIndex === i - 1,
-        }"
-        :style="{
-          ...memberIndexImage,
-          ...snakeHeadImage,
-          ...setSnakeBodyImage(i),
-        }"
-      >
-        <!-- {{ i - 1 }} -->
+      <div class="hellosnake__map__grid">
+        <!-- セルを100個生成して、必要に応じてhead, body, memberクラスを付ける -->
+        <div
+          v-for="i in gridSize * gridSize"
+          :key="i"
+          :class="{
+            cell: true,
+            head: snakeHeadIndex === i - 1,
+            ['body-' + (i - 1)]: snake.bodyIndexes.includes(i - 1),
+            member: memberIndex === i - 1,
+          }"
+          :style="{
+            ...memberIndexImage,
+            ...snakeHeadImage,
+            ...setSnakeBodyImage(i),
+          }"
+        >
+          <!-- {{ i - 1 }} -->
+        </div>
       </div>
     </div>
 
@@ -85,7 +90,7 @@ export default {
       }, // 初期位置
       bodyIndexes: [0], // 体の位置インデックスたち
       direction: "→", // 進行方向
-      speed: 200, // 1マス進むのにかかる時間[ms]
+      speed: 400, // 1マス進むのにかかる時間[ms]
     });
 
     const isFrameout = computed(() => {
@@ -136,14 +141,12 @@ export default {
       isStart.value = false;
     };
 
-    const {
-      memberIndexUpdated,
-      snakeUpdated,
-      ImageFilePath,
-    } = gatheringMembersAction(gridSize, memberIndex, snake, isGatheringMember);
+    const { memberIndexUpdated, snakeUpdated, ImageFilePath } =
+      gatheringMembersAction(gridSize, memberIndex, snake, isGatheringMember);
 
     memberIndex.value = memberIndexUpdated.value;
     Object.assign(snake.bodyIndexes, snakeUpdated.bodyIndexes);
+    Object.assign(snake.speed, snakeUpdated.speed);
 
     const memberIndexImage = computed(() => ({
       "--member-index-image": `url(${ImageFilePath.member})`,
@@ -222,20 +225,24 @@ export default {
   }
 
   &__map {
-    --grid-size: 10; /* 10 x 10 マス（CSS変数） */
+    display: inline-block;
 
-    display: grid;
-    grid-template-columns: repeat(
-      var(--grid-size),
-      minmax(50px, 80px)
-    ); /* 10列 幅80px */
-    grid-template-rows: repeat(
-      var(--grid-size),
-      minmax(50px, 80px)
-    ); /* 10行 高さ80px */
+    &__grid {
+      --grid-size: 10; /* 10 x 10 マス（CSS変数） */
 
-    align-items: stretch;
-    justify-self: center;
+      display: grid;
+      grid-template-columns: repeat(
+        var(--grid-size),
+        minmax(50px, 80px)
+      ); /* 10列 幅80px */
+      grid-template-rows: repeat(
+        var(--grid-size),
+        minmax(50px, 80px)
+      ); /* 10行 高さ80px */
+
+      align-items: stretch;
+      justify-self: center;
+    }
 
     /* セルの色 */
     .cell {
@@ -266,15 +273,16 @@ export default {
   }
 
   &__image {
-    width: 800px;
+    width: 1000px;
     object-fit: cover;
-    height: 800px;
+    height: 1000px;
     position: absolute;
-    top: 200px;
+    top: 50vh;
     left: 0;
-    // right: 0;
-    // bottom: 0;
+    right: 0;
+    bottom: 0;
     margin: auto;
+    // display: inline-block;
 
     &__text {
       font-family: "Segoe UI", sans-serif;
