@@ -6,7 +6,7 @@
 
     <div v-if="isStart" class="hellosnake__start">
       <p style="font-size: 50px; color: coral; font-family: sans-serif">
-        HELLO PROJECT SNAKE GAME
+        HELLO-PROJECT SNAKE GAME
       </p>
       <button class="hellosnake__start__btn" @click="startingGame()">
         START
@@ -161,7 +161,6 @@ export default {
       if (ImageFilePath.body.length === 0) return;
 
       // gridIndexの順番ごとに異なる画像をセットする
-      console.log("target is " + snake.bodyIndexes.indexOf(gridIndex - 1));
       return {
         "background-image": `url(${
           ImageFilePath.body[snake.bodyIndexes.indexOf(gridIndex - 1)]
